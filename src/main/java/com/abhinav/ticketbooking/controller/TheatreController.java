@@ -3,7 +3,8 @@ package com.abhinav.ticketbooking.controller;
 import com.abhinav.ticketbooking.dto.TheatreResponse;
 import com.abhinav.ticketbooking.entity.movie.Theatre;
 import com.abhinav.ticketbooking.service.theatre.TheatreService;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +19,11 @@ public class TheatreController {
         this.theatreService = theatreService;
     }
 
-    // Add a theatre
+    // Add a theatre (Admin only)
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Theatre addTheatre(@RequestBody Theatre theatre) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TheatreResponse addTheatre(@RequestBody Theatre theatre) {
         return theatreService.addTheatre(theatre);
     }
 

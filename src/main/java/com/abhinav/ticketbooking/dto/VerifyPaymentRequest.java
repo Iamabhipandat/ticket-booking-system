@@ -1,10 +1,26 @@
 package com.abhinav.ticketbooking.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class VerifyPaymentRequest {
 
+    @NotBlank(message = "Razorpay Order ID is required")
     private String razorpayOrderId;
+
+    @NotBlank(message = "Razorpay Payment ID is required")
     private String razorpayPaymentId;
+
+    @NotBlank(message = "Razorpay Signature is required")
     private String razorpaySignature;
+
+    public VerifyPaymentRequest() {
+    }
+
+    public VerifyPaymentRequest(String razorpayOrderId, String razorpayPaymentId, String razorpaySignature) {
+        this.razorpayOrderId = razorpayOrderId;
+        this.razorpayPaymentId = razorpayPaymentId;
+        this.razorpaySignature = razorpaySignature;
+    }
 
     public String getRazorpayOrderId() {
         return razorpayOrderId;

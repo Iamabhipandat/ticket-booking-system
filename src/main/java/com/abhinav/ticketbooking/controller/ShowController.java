@@ -3,7 +3,8 @@ package com.abhinav.ticketbooking.controller;
 import com.abhinav.ticketbooking.dto.ShowDetailsResponse;
 import com.abhinav.ticketbooking.entity.show.Show;
 import com.abhinav.ticketbooking.service.showseat.ShowService;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,9 +20,11 @@ public class ShowController {
         this.showService = showService;
     }
 
-    // Create a show
+    // Create a show (Admin only)
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/movie/{movieId}/screen/{screenId}")
-    public Show createShow(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShowDetailsResponse createShow(
             @PathVariable Long movieId,
             @PathVariable Long screenId,
             @RequestBody Show show
@@ -39,7 +42,7 @@ public class ShowController {
 
     // Get shows by screen
     @GetMapping("/screen/{screenId}")
-    public List<Show> getShowsByScreen(
+    public List<ShowDetailsResponse> getShowsByScreen(
             @PathVariable Long screenId
     ) {
         return showService.getShowsByScreen(screenId);
@@ -47,19 +50,22 @@ public class ShowController {
 
     // Get shows by movie
     @GetMapping("/movie/{movieId}")
-    public List<Show> getShowsByMovie(
+    public List<ShowDetailsResponse> getShowsByMovie(
             @PathVariable Long movieId
     ) {
         return showService.getShowsByMovie(movieId);
     }
 
-    // Cancel a show
+    // Cancel a show (Admin only)
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/cancel")
-    public Show cancelShow(
+    public ShowDetailsResponse cancelShow(
             @PathVariable Long id
     ) {
         return showService.cancelShow(id);
     }
+
+    // Filter shows by movie and date
     @GetMapping("/movie/{movieId}/date")
     public List<ShowDetailsResponse> getShowsByMovieAndDate(
             @PathVariable Long movieId,

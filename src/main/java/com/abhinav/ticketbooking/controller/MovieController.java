@@ -3,10 +3,13 @@ package com.abhinav.ticketbooking.controller;
 import com.abhinav.ticketbooking.dto.MovieResponse;
 import com.abhinav.ticketbooking.entity.movie.Movie;
 import com.abhinav.ticketbooking.service.movie.MovieService;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -18,9 +21,11 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    // Add a movie
+    // Add a movie (Admin only)
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Movie addMovie(@RequestBody Movie movie) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public MovieResponse addMovie(@RequestBody Movie movie) {
         return movieService.addMovie(movie);
     }
 
@@ -36,33 +41,29 @@ public class MovieController {
         return movieService.getMovieDetails(id);
     }
 
-    // Delete movie
+    // Delete movie (Admin only)
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public String deleteMovie(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
-        return "Movie deleted successfully";
+        return ResponseEntity.ok(Map.of("message", "Movie deleted successfully"));
     }
+
     // Search movies by title
     @GetMapping("/search")
-    public List<MovieResponse> searchMovies(
-            @RequestParam String title
-    ) {
+    public List<MovieResponse> searchMovies(@RequestParam String title) {
         return movieService.searchMovies(title);
     }
 
     // Filter movies by language
     @GetMapping("/language/{language}")
-    public List<MovieResponse> getMoviesByLanguage(
-            @PathVariable String language
-    ) {
+    public List<MovieResponse> getMoviesByLanguage(@PathVariable String language) {
         return movieService.getMoviesByLanguage(language);
     }
 
     // Filter movies by genre
     @GetMapping("/genre/{genre}")
-    public List<MovieResponse> getMoviesByGenre(
-            @PathVariable String genre
-    ) {
+    public List<MovieResponse> getMoviesByGenre(@PathVariable String genre) {
         return movieService.getMoviesByGenre(genre);
     }
 

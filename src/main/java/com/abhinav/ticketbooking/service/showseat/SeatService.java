@@ -1,7 +1,10 @@
 package com.abhinav.ticketbooking.service.showseat;
 
+import com.abhinav.ticketbooking.dto.SeatResponse;
 import com.abhinav.ticketbooking.entity.movie.Screen;
 import com.abhinav.ticketbooking.entity.seat.Seat;
+import com.abhinav.ticketbooking.exception.BadRequestException;
+import com.abhinav.ticketbooking.exception.ResourceNotFoundException;
 import com.abhinav.ticketbooking.repository.ScreenRepository;
 import com.abhinav.ticketbooking.repository.SeatRepository;
 import org.springframework.stereotype.Service;
@@ -24,65 +27,56 @@ public class SeatService {
     }
 
     @Transactional
-    public Seat createSeat(Long screenId, Seat seat) {
-
+    public SeatResponse createSeat(Long screenId, Seat seat) {
         Screen screen = screenRepository.findById(screenId)
-                .orElseThrow(() ->
-                        new RuntimeException("Screen not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found with ID: " + screenId));
 
-        boolean seatExists =
-                seatRepository
-                        .existsByScreenIdAndRowNameAndSeatNumber(
-                                screenId,
-                                seat.getRowName(),
-                                seat.getSeatNumber()
-                        );
+        boolean seatExists = seatRepository.existsByScreenIdAndRowNameAndSeatNumber(
+                screenId,
+                seat.getRowName(),
+                seat.getSeatNumber()
+        );
 
         if (seatExists) {
-            throw new RuntimeException(
-                    "Seat already exists in this screen"
-            );
+            throw new BadRequestException("Seat " + seat.getRowName() + seat.getSeatNumber() + " already exists in this screen");
         }
 
         seat.setScreen(screen);
-
-        return seatRepository.save(seat);
+        Seat saved = seatRepository.save(seat);
+        return SeatResponse.from(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<Seat> getSeatsByScreen(Long screenId) {
-
+    public List<SeatResponse> getSeatsByScreen(Long screenId) {
         if (!screenRepository.existsById(screenId)) {
-            throw new RuntimeException("Screen not found");
+            throw new ResourceNotFoundException("Screen not found with ID: " + screenId);
         }
 
-        return seatRepository.findByScreenId(screenId);
+        return seatRepository.findByScreenId(screenId)
+                .stream()
+                .map(SeatResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Seat> getSeatsByScreenAndRow(
-            Long screenId,
-            String rowName
-    ) {
-        return seatRepository.findByScreenIdAndRowName(
-                screenId,
-                rowName
-        );
+    public List<SeatResponse> getSeatsByScreenAndRow(Long screenId, String rowName) {
+        return seatRepository.findByScreenIdAndRowName(screenId, rowName)
+                .stream()
+                .map(SeatResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Seat getSeatById(Long id) {
-
-        return seatRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Seat not found"));
+    public SeatResponse getSeatById(Long id) {
+        Seat seat = seatRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Seat not found with ID: " + id));
+        return SeatResponse.from(seat);
     }
 
     @Transactional
     public void deleteSeat(Long id) {
-
-        Seat seat = getSeatById(id);
-
+        Seat seat = seatRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Seat not found with ID: " + id));
         seatRepository.delete(seat);
     }
 }

@@ -1,5 +1,6 @@
 package com.abhinav.ticketbooking.entity.booking;
 
+import com.abhinav.ticketbooking.entity.auth.User;
 import com.abhinav.ticketbooking.entity.show.Show;
 import jakarta.persistence.*;
 
@@ -17,6 +18,10 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "customer_email", nullable = false)
     private String customerEmail;
@@ -54,6 +59,14 @@ public class Booking {
 
     public void setShow(Show show) {
         this.show = show;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getCustomerEmail() {

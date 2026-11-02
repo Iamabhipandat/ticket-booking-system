@@ -3,9 +3,10 @@ package com.abhinav.ticketbooking.service.screen;
 import com.abhinav.ticketbooking.dto.ScreenResponse;
 import com.abhinav.ticketbooking.entity.movie.Screen;
 import com.abhinav.ticketbooking.entity.movie.Theatre;
+import com.abhinav.ticketbooking.exception.BadRequestException;
+import com.abhinav.ticketbooking.exception.ResourceNotFoundException;
 import com.abhinav.ticketbooking.repository.ScreenRepository;
 import com.abhinav.ticketbooking.repository.TheatreRepository;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,67 +28,29 @@ public class ScreenService {
 
     // Create a screen inside a theatre
     @Transactional
-    public Screen createScreen(Long theatreId, Screen screen) {
-
+    public ScreenResponse createScreen(Long theatreId, Screen screen) {
         Theatre theatre = theatreRepository.findById(theatreId)
-                .orElseThrow(() ->
-                        new RuntimeException("Theatre not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found with ID: " + theatreId));
 
-        boolean alreadyExists =
-                screenRepository.findByTheatreIdAndScreenNumber(
-                        theatreId,
-                        screen.getScreenNumber()
-                ).isPresent();
+        boolean alreadyExists = screenRepository.findByTheatreIdAndScreenNumber(
+                theatreId,
+                screen.getScreenNumber()
+        ).isPresent();
 
         if (alreadyExists) {
-            throw new RuntimeException(
-                    "Screen number already exists in this theatre");
+            throw new BadRequestException("Screen number " + screen.getScreenNumber() + " already exists in this theatre");
         }
 
         screen.setTheatre(theatre);
-
-        return screenRepository.save(screen);
+        Screen saved = screenRepository.save(screen);
+        return ScreenResponse.from(saved);
     }
 
-    // Get all screens belonging to a theatre
+    // Get all screens belonging to a theatre as DTOs
     @Transactional(readOnly = true)
-    public List<Screen> getScreensByTheatre(Long theatreId) {
-
+    public List<ScreenResponse> getScreensByTheatre(Long theatreId) {
         if (!theatreRepository.existsById(theatreId)) {
-            throw new RuntimeException("Theatre not found");
-        }
-
-        return screenRepository.findByTheatreId(theatreId);
-    }
-
-    // Get screen entity by ID
-    @Transactional(readOnly = true)
-    public Screen getScreenById(Long id) {
-
-        return screenRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Screen not found"));
-    }
-
-    // Get screen details as DTO
-    @Transactional(readOnly = true)
-    public ScreenResponse getScreenDetails(Long id) {
-
-        Screen screen = screenRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Screen not found"));
-
-        return ScreenResponse.from(screen);
-    }
-
-    // Get screen details for all screens in a theatre
-    @Transactional(readOnly = true)
-    public List<ScreenResponse> getScreenDetailsByTheatre(
-            Long theatreId
-    ) {
-
-        if (!theatreRepository.existsById(theatreId)) {
-            throw new RuntimeException("Theatre not found");
+            throw new ResourceNotFoundException("Theatre not found with ID: " + theatreId);
         }
 
         return screenRepository.findByTheatreId(theatreId)
@@ -96,32 +59,41 @@ public class ScreenService {
                 .toList();
     }
 
+    // Get screen entity by ID
+    @Transactional(readOnly = true)
+    public Screen getScreenById(Long id) {
+        return screenRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Screen not found with ID: " + id));
+    }
+
+    // Get screen details as DTO
+    @Transactional(readOnly = true)
+    public ScreenResponse getScreenDetails(Long id) {
+        Screen screen = getScreenById(id);
+        return ScreenResponse.from(screen);
+    }
+
     // Update screen details
     @Transactional
-    public Screen updateScreen(
-            Long id,
-            Screen updatedScreen
-    ) {
-
+    public ScreenResponse updateScreen(Long id, Screen updatedScreen) {
         Screen existingScreen = getScreenById(id);
 
-        existingScreen.setScreenNumber(
-                updatedScreen.getScreenNumber()
-        );
+        if (updatedScreen.getScreenNumber() != null) {
+            existingScreen.setScreenNumber(updatedScreen.getScreenNumber());
+        }
 
-        existingScreen.setTotalSeats(
-                updatedScreen.getTotalSeats()
-        );
+        if (updatedScreen.getTotalSeats() != null) {
+            existingScreen.setTotalSeats(updatedScreen.getTotalSeats());
+        }
 
-        return screenRepository.save(existingScreen);
+        Screen saved = screenRepository.save(existingScreen);
+        return ScreenResponse.from(saved);
     }
 
     // Delete a screen
     @Transactional
     public void deleteScreen(Long id) {
-
         Screen screen = getScreenById(id);
-
         screenRepository.delete(screen);
     }
 }

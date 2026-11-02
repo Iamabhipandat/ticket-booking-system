@@ -134,9 +134,9 @@ public class Payment {
         return refundStatus;
     }
 
-//    public void setRefundStatus(RefundStatus refundStatus) {
-//        this.refundStatus = refundStatus;
-//    }
+    public void setRefundStatus(RefundStatus refundStatus) {
+        this.refundStatus = refundStatus;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -152,8 +152,5 @@ public class Payment {
 
     public void setPaidAt(LocalDateTime paidAt) {
         this.paidAt = paidAt;
-    }
-
-    public void setRefundStatus(RefundStatus refundStatus) {
     }
 }

@@ -2,9 +2,10 @@ package com.abhinav.ticketbooking.service.theatre;
 
 import com.abhinav.ticketbooking.dto.TheatreResponse;
 import com.abhinav.ticketbooking.entity.movie.Theatre;
+import com.abhinav.ticketbooking.exception.ResourceNotFoundException;
 import com.abhinav.ticketbooking.repository.TheatreRepository;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class TheatreService {
         this.theatreRepository = theatreRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<TheatreResponse> getTheatresByCity(String city) {
         return theatreRepository
                 .findByCityIgnoreCase(city)
@@ -25,6 +27,7 @@ public class TheatreService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<TheatreResponse> searchTheatresByName(String name) {
         return theatreRepository
                 .findByNameContainingIgnoreCase(name)
@@ -33,10 +36,8 @@ public class TheatreService {
                 .toList();
     }
 
-    public List<TheatreResponse> getTheatresByCityAndName(
-            String city,
-            String name
-    ) {
+    @Transactional(readOnly = true)
+    public List<TheatreResponse> getTheatresByCityAndName(String city, String name) {
         return theatreRepository
                 .findByCityIgnoreCaseAndNameContainingIgnoreCase(city, name)
                 .stream()
@@ -44,14 +45,17 @@ public class TheatreService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public TheatreResponse getTheatreById(Long id) {
         Theatre theatre = theatreRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Theatre not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Theatre not found with ID: " + id));
 
         return TheatreResponse.from(theatre);
     }
 
-    public Theatre addTheatre(Theatre theatre) {
-        return theatreRepository.save(theatre);
+    @Transactional
+    public TheatreResponse addTheatre(Theatre theatre) {
+        Theatre saved = theatreRepository.save(theatre);
+        return TheatreResponse.from(saved);
     }
 }
