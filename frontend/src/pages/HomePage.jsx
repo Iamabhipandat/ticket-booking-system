@@ -178,7 +178,7 @@ export const HomePage = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {movies.map((movie) => (
               <div
-                key={movie.id}
+                key={movie.id || movie.movieId}
                 className="group bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-rose-950/30 hover:-translate-y-1"
               >
                 {/* Poster */}
@@ -224,7 +224,7 @@ export const HomePage = () => {
                   </div>
 
                   <Link
-                    to={`/movie/${movie.id}`}
+                    to={`/movie/${movie.id || movie.movieId}`}
                     className="w-full text-center bg-slate-800 hover:bg-rose-600 text-slate-200 hover:text-white font-bold text-xs py-2 rounded-xl transition-all shadow-sm"
                   >
                     View Shows

@@ -35,7 +35,6 @@ public class MovieResponse {
 
     // Convert Movie entity into MovieResponse DTO
     public static MovieResponse from(Movie movie) {
-
         return new MovieResponse(
                 movie.getId(),
                 movie.getTitle(),
@@ -46,6 +45,10 @@ public class MovieResponse {
                 movie.getPosterUrl(),
                 movie.getRating()
         );
+    }
+
+    public Long getId() {
+        return movieId;
     }
 
     public Long getMovieId() {

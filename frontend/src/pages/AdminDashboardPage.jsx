@@ -576,7 +576,7 @@ export const AdminDashboardPage = () => {
             <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
               {movies.map((m) => (
                 <div
-                  key={m.id}
+                  key={m.id || m.movieId}
                   className="flex items-center justify-between p-3 bg-slate-950 rounded-2xl border border-slate-800"
                 >
                   <div className="flex items-center gap-3">
@@ -593,7 +593,7 @@ export const AdminDashboardPage = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleDeleteMovie(m.id)}
+                    onClick={() => handleDeleteMovie(m.id || m.movieId)}
                     className="p-2 text-rose-400 hover:bg-rose-950/40 rounded-xl transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -744,7 +744,7 @@ export const AdminDashboardPage = () => {
               >
                 <option value="">Select movie...</option>
                 {movies.map((m) => (
-                  <option key={m.id} value={m.id}>
+                  <option key={m.id || m.movieId} value={m.id || m.movieId}>
                     {m.title} ({m.language})
                   </option>
                 ))}
