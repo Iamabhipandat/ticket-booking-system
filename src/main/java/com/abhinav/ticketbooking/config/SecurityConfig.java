@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,40 +45,40 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints: Auth and Webhooks
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth", "/api/auth/**").permitAll()
                         .requestMatchers("/api/payments/webhook").permitAll()
 
                         // Public browsing endpoints (GET)
-                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/theatres/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/screens/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/seats/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/shows/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/show-seats/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/tickets/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/movies", "/api/movies/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/theatres", "/api/theatres/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/screens", "/api/screens/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/seats", "/api/seats/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/shows", "/api/shows/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/show-seats", "/api/show-seats/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tickets", "/api/tickets/**").permitAll()
 
                         // Admin-only management endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/movies", "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/movies", "/api/movies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/movies", "/api/movies/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/theatres/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/theatres/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/theatres/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/theatres", "/api/theatres/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/theatres", "/api/theatres/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/theatres", "/api/theatres/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/screens/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/screens/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/screens/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/screens", "/api/screens/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/screens", "/api/screens/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/screens", "/api/screens/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/seats/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/seats", "/api/seats/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/seats", "/api/seats/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/shows/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/shows/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/shows/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/shows", "/api/shows/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/shows", "/api/shows/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/shows", "/api/shows/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/show-seats/initialize/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/tickets/validate/**").hasRole("ADMIN")
+                        .requestMatchers("/api/show-seats/initialize", "/api/show-seats/initialize/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tickets/validate", "/api/tickets/validate/**").hasRole("ADMIN")
 
                         // Actuator / Error endpoints
                         .requestMatchers("/error", "/actuator/**").permitAll()
